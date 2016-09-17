@@ -20,7 +20,7 @@ class getRank(BaseHandler):
             value=int(value)
             )
         d_obj.put()
-        self.write(dashboard.obtainRank(value))
+        self.write(dashboard.obtainRank(key, value))
 
 
 

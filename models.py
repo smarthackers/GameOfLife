@@ -8,7 +8,9 @@ class dashboard(ndb.Model):
     value = ndb.IntegerProperty()
 
     @classmethod
-    def obtainRank(cls, v):
+    def obtainRank(cls, k, v):
         q = cls.query().filter(dashboard.value >= int(v))
-        return q.count() + 1
+        q1 = cls.query().filter(dashboard.key == k)
+        off = 1 if q1.count() == 0 else 0 
+        return q.count() + 0 #off
 
