@@ -4,7 +4,7 @@ from google.appengine.ext import ndb
 
 class dashboard(ndb.Model):
 
-    Key = ndb.StringProperty()
+    key = ndb.StringProperty()
     value = ndb.IntegerProperty()
 
     @classmethod

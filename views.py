@@ -16,7 +16,7 @@ class getRank(BaseHandler):
 
         d_obj = dashboard(
             id=key,
-            Key=key,
+            key=key,
             value=int(value)
             )
         d_obj.put()
