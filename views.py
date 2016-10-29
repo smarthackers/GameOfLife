@@ -11,17 +11,36 @@ from google.appengine.api import memcache
 class getRank(BaseHandler):
 
     def get(self):
-        key = self.request.get('id')
-        value = self.request.get('score')
+        playerId = self.request.get('id')
+        playersBestScore = self.request.get('bs')
+        playersTopScore = self.request.get('ts')
 
-        d_obj = dashboard(
-            id=key,
-            key=key,
-            value=int(value)
+        player_obj = Player(
+            id=playerId,
+            bestScore=int(playersBestScore),
+            topScore=int(playersTopScore)
             )
-        d_obj.put()
-        self.write(dashboard.obtainRank(key, value))
 
+        self.write(Player.obtainRankFromDB(player_obj))
 
+class getScoreBoard(BaseHandler):
 
+    def get(self):
+        playerId = self.request.get('id')
+        self.write(Player.obtainScoreBoardFromDB(playerId))
+
+class savePlayerDetails(BaseHandler):
+
+    def get(self):
+        playerId = self.request.get('id')
+        playersName = self.request.get('name')
+        playersCountry = self.request.get('country')
+
+        player_obj = Player(
+            id = playerId,
+            name = playersName,
+            country = playersCountry
+            )
+
+        self.write(Player.savePlayerDetailsToDB(player_obj))
 
