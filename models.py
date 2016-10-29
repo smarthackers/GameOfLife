@@ -19,36 +19,35 @@ class Player(ndb.Model):
     @classmethod
     def obtainRankFromDB(cls, currentPlayer):
     	currentPlayer.put()
-        checkBestScoreRank = (cls.query().filter(Player.bestScore >= int(currentPlayer.bestScore)).count()) + 1
-        checkTopScoreRank = (cls.query().filter(Player.topScore >= int(currentPlayer.topScore)).count()) + 1
-        return "{\"bestRank\":" +str(checkBestScoreRank) + ", \"topRank\":" + str(checkTopScoreRank) +"}"
+        checkBestScoreRank = (cls.query().filter(Player.bestScore >= currentPlayer.bestScore).count()) + 1
+        checkTopScoreRank = (cls.query().filter(Player.topScore >= currentPlayer.topScore).count()) + 1
+        return dict(br=checkBestScoreRank, tr=checkTopScoreRank)
 
     @classmethod
     def obtainScoreBoardFromDB(cls, currentUsersPlayerId):
-    	scoreBoardOutput = {'values' : []}
+    	leaderBoardOutput = {'globalRank' : [], 'globalBestTen' : [], 'globalTopTen' : []}
     	currentPlayer = cls.query().filter(Player.id = currentUsersPlayerId).get()
     	
     	checkAboveRankersOnScoreBoard = cls.query().filter(Player.bestScore > currentPlayer.bestScore).order("bestScore")
-    	for p in checkTopTenBestScoreRanks.run(limit = 5)
-        	scoreBoardOutput['values'].append(json.dumps(p.__dict__))
+    	for p in checkAboveRankersOnScoreBoard.run(limit = 5)
+        	leaderBoardOutput['globalRank'].append(json.dumps(p.__dict__))
 
-        scoreBoardOutput['values'].append(json.dumps(currentPlayer.__dict__))
+        leaderBoardOutput['globalRank'].append(json.dumps(currentPlayer.__dict__))
 
-    	checkBelowRankersOnScoreBoard = cls.query().filter(Player.bestScore <= currentPlayer.bestScore).order("-bestScore")
-        
-        remainingEntries = 10 - len(scoreBoardOutput['values'])
-        for p in checkTopTenBestScoreRanks.run(limit = remainingEntries)
-        	scoreBoardOutput['values'].append(json.dumps(p.__dict__))
+        remainingEntries = 10 - len(leaderBoardOutput['globalRank'])
+        checkEqualOrBelowRankersOnScoreBoard = cls.query().filter(Player.bestScore <= currentPlayer.bestScore).order("-bestScore")
+        for p in checkEqualOrBelowRankersOnScoreBoard.run(limit = remainingEntries)
+        	leaderBoardOutput['globalRank'].append(json.dumps(p.__dict__))
 
-        checkTopTenBestScoreRanks = cls.query().order("-bestScore")
-        for p in checkTopTenBestScoreRanks.run(limit = 10)
-        	scoreBoardOutput['values'].append(json.dumps(p.__dict__))
+        checkTenBestScoreRanks = cls.query().order("-bestScore")
+        for p in checkTenBestScoreRanks.run(limit = 10)
+        	leaderBoardOutput['globalBestTen'].append(json.dumps(p.__dict__))
 
-        checkTopTenTopScoreRanks = cls.query().order("-topScore")
-        for p in checkTopTenTopScoreRanks.run(limit = 10)
-        	scoreBoardOutput['values'].append(json.dumps(p.__dict__))
+        checkTenTopScoreRanks = cls.query().order("-topScore")
+        for p in checkTenTopScoreRanks.run(limit = 10)
+        	leaderBoardOutput['globalTopTen'].append(json.dumps(p.__dict__))
     
-        return scoreBoardOutput
+        return leaderBoardOutput
 
 
     @classmethod
