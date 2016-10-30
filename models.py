@@ -56,3 +56,14 @@ class Player(ndb.Model):
     	player.name = currentPlayer.name
     	player.country = currentPlayer.country
     	return player.put()
+
+#code for backward compatibility
+
+class dashboard(ndb.Model):
+
+    key = ndb.StringProperty()
+    value = ndb.IntegerProperty()
+
+    @classmethod
+    def obtainRank(cls, score):
+        return cls.query().filter(dashboard.value >= int(score)).count()

@@ -8,7 +8,7 @@ from base_handler import BaseHandler
 from google.appengine.api import memcache
 
 
-class getRank(BaseHandler):
+class getRanks(BaseHandler):
 
     def get(self):
         playerId = self.request.get('id')
@@ -44,3 +44,18 @@ class savePlayerDetails(BaseHandler):
 
         self.write(Player.savePlayerDetailsToDB(player_obj))
 
+#code for backward compatibility
+
+class getRank(BaseHandler):
+
+    def get(self):
+        key = self.request.get('id')
+        value = self.request.get('score')
+
+        d_obj = dashboard(
+            id=key,
+            key=key,
+            value=int(value)
+            )
+        d_obj.put()
+        self.write(dashboard.obtainRank(value))
