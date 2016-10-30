@@ -15,19 +15,18 @@ class getRanks(BaseHandler):
         playersBestScore = self.request.get('bs')
         playersTopScore = self.request.get('ts')
 
-        player_obj = Player(
-            id=playerId,
-            bestScore=int(playersBestScore),
-            topScore=int(playersTopScore)
-            )
-
+        player_obj = Player()
+        player_obj.ID = playerId
+        player_obj.bestScore = int(playersBestScore)
+        player_obj.topScore = int(playersTopScore)
+            
         self.write(Player.obtainRankFromDB(player_obj))
 
-class getScoreBoard(BaseHandler):
+class getLeaderBoard(BaseHandler):
 
     def get(self):
         playerId = self.request.get('id')
-        self.write(Player.obtainScoreBoardFromDB(playerId))
+        self.write(Player.obtainLeaderBoardFromDB(playerId))
 
 class savePlayerDetails(BaseHandler):
 
@@ -36,11 +35,10 @@ class savePlayerDetails(BaseHandler):
         playersName = self.request.get('name')
         playersCountry = self.request.get('country')
 
-        player_obj = Player(
-            id = playerId,
-            name = playersName,
-            country = playersCountry
-            )
+        player_obj = Player()
+        player_obj.ID=playerId
+        player_obj.name = playersName
+        player_obj.country = playersCountry
 
         self.write(Player.savePlayerDetailsToDB(player_obj))
 

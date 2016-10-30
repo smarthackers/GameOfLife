@@ -7,7 +7,7 @@ from views import *
 
 app = webapp2.WSGIApplication([
     ('/getRanks', getRanks),
-    ('/getScoreBoard', getScoreBoard),
+    ('/getLeaderBoard', getLeaderBoard),
     ('/savePlayerDetails', savePlayerDetails),
     #code for backward compatibility
     ('/getRank', getRank)

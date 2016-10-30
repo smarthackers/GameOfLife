@@ -5,12 +5,15 @@ from google.appengine.ext import ndb
 
 class Player(ndb.Model):
 
+    ID = ndb.StringProperty()
     name = ndb.StringProperty()
     bestScore = ndb.IntegerProperty()
     topScore = ndb.IntegerProperty()
     country = ndb.StringProperty()
 
     def __init__(self):
+        ndb.Model.__init__(self)
+        self.ID = ""
         self.name = ""
         self.bestScore = 0
         self.topScore = 0
@@ -19,40 +22,40 @@ class Player(ndb.Model):
     @classmethod
     def obtainRankFromDB(cls, currentPlayer):
     	currentPlayer.put()
-        checkBestScoreRank = (cls.query().filter(Player.bestScore >= currentPlayer.bestScore).count()) + 1
-        checkTopScoreRank = (cls.query().filter(Player.topScore >= currentPlayer.topScore).count()) + 1
+        checkBestScoreRank = (cls.query(Player.bestScore >= currentPlayer.bestScore).count())
+        checkTopScoreRank = (cls.query(Player.topScore >= currentPlayer.topScore).count())
         return dict(br=checkBestScoreRank, tr=checkTopScoreRank)
 
     @classmethod
-    def obtainScoreBoardFromDB(cls, currentUsersPlayerId):
+    def obtainLeaderBoardFromDB(cls, currentUsersPlayerId):
     	leaderBoardOutput = {'globalRank' : [], 'globalBestTen' : [], 'globalTopTen' : []}
-    	currentPlayer = cls.query().filter(Player.id = currentUsersPlayerId).get()
+    	currentPlayer = cls.query(Player.ID == currentUsersPlayerId).get()
     	
-    	checkAboveRankersOnScoreBoard = cls.query().filter(Player.bestScore > currentPlayer.bestScore).order("bestScore")
-    	for p in checkAboveRankersOnScoreBoard.run(limit = 5)
-        	leaderBoardOutput['globalRank'].append(json.dumps(p.__dict__))
+    	checkAboveRankersOnScoreBoard = cls.query(Player.bestScore > currentPlayer.bestScore).order(Player.bestScore).fetch(limit=5)
+    	for p in checkAboveRankersOnScoreBoard:
+        	leaderBoardOutput['globalRank'].append(p.to_dict()))
 
-        leaderBoardOutput['globalRank'].append(json.dumps(currentPlayer.__dict__))
+        leaderBoardOutput['globalRank'].append(currentPlayer.to_dict()))
 
         remainingEntries = 10 - len(leaderBoardOutput['globalRank'])
-        checkEqualOrBelowRankersOnScoreBoard = cls.query().filter(Player.bestScore <= currentPlayer.bestScore).order("-bestScore")
-        for p in checkEqualOrBelowRankersOnScoreBoard.run(limit = remainingEntries)
-        	leaderBoardOutput['globalRank'].append(json.dumps(p.__dict__))
+        checkEqualOrBelowRankersOnScoreBoard = cls.query(Player.bestScore <= currentPlayer.bestScore).order(-Player.bestScore).fetch(limit=remainingEntries)
+        for p in checkEqualOrBelowRankersOnScoreBoard:
+        	leaderBoardOutput['globalRank'].append(p.to_dict()))
 
-        checkTenBestScoreRanks = cls.query().order("-bestScore")
-        for p in checkTenBestScoreRanks.run(limit = 10)
-        	leaderBoardOutput['globalBestTen'].append(json.dumps(p.__dict__))
+        checkTenBestScoreRanks = cls.query().order(-Player.bestScore).fetch(limit=10)
+        for p in checkTenBestScoreRanks:
+        	leaderBoardOutput['globalBestTen'].append(p.to_dict()))
 
-        checkTenTopScoreRanks = cls.query().order("-topScore")
-        for p in checkTenTopScoreRanks.run(limit = 10)
-        	leaderBoardOutput['globalTopTen'].append(json.dumps(p.__dict__))
+        checkTenTopScoreRanks = cls.query().order(-Player.topScore).fetch(limit=10)
+        for p in checkTenTopScoreRanks:
+        	leaderBoardOutput['globalTopTen'].append(p.to_dict()))
     
         return leaderBoardOutput
 
 
     @classmethod
     def savePlayerDetailsToDB(cls, currentPlayer):
-    	player = cls.query().filter(Player.id = currentPlayer.id).get()
+    	player = cls.query(Player.ID == currentPlayer.ID).get()
     	player.name = currentPlayer.name
     	player.country = currentPlayer.country
     	return player.put()
@@ -66,4 +69,4 @@ class dashboard(ndb.Model):
 
     @classmethod
     def obtainRank(cls, score):
-        return cls.query().filter(dashboard.value >= int(score)).count()
+        return cls.query(dashboard.value >= int(score)).count()
